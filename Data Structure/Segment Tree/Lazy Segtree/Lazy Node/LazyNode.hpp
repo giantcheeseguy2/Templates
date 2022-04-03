@@ -1,4 +1,4 @@
-struct RangeNode {
+struct LazyNode {
 
     using T = long long;
     using L = long long;

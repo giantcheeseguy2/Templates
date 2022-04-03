@@ -1,4 +1,3 @@
-//https://judge.yosupo.jp/problem/range_affine_range_sum
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -91,41 +90,95 @@ struct LazySeg : public Node {
     }
 };
 
+struct Node { 
+
+    const int mod = 1e9 + 7;
+
+    long long a, b, c;
+
+    Node(){
+
+    }
+
+    Node(long long _a, long long _b, long long _c){
+        a = _a;
+        b = _b;
+        c = _c;
+    }
+
+    Node &operator=(const Node &v){
+        a = v.a;
+        b = v.b;
+        c = v.c;
+        return *this;
+    }
+
+    Node &operator*=(const Node &v){
+        Node ret = Node((((v.a*a)%mod) + ((v.b*b)%mod))%mod, (((v.b*a)%mod) + ((v.c*b)%mod))%mod, (((v.b*b)%mod) + ((v.c*c)%mod))%mod);
+        a = ret.a;
+        b = ret.b;
+        c = ret.c;
+        return *this;
+    }
+
+    Node operator+(const Node &v){
+        return Node((a + v.a)%mod, (b + v.b)%mod, (c + v.c)%mod);
+    }
+
+    Node operator^(int x){
+        Node ret(1, 0, 1);
+        Node prod(1, 1, 0);
+        while(x){
+            if(x%2 == 1) ret *= prod;
+            prod *= prod;
+            x /= 2;
+        }
+        return ret;
+    }
+
+    friend bool operator==(const Node &a, const Node &b){
+        return a.a == b.a && a.b == b.b && a.c == b.c;
+    }
+};
+
 struct LazyNode {
 
-    const long long MOD = 998244353;
+    using T =  Node;
+    using L =  Node;
 
-    using T = long long;
-    using L = pair<long long, long long>;
-
-    const L empty = {1, 0};
+    const L empty =  Node(1, 0, 1);
 
     void apply(T &a, L &b, L c, int l, int r){
-        a = (c.first*a%MOD + c.second*(r - l + 1)%MOD)%MOD;
-        b = {c.first*b.first%MOD, c.first*b.second%MOD + c.second%MOD};
+        a *= c;
+        b *= c;
     }
 
     T merge(T a, T b){
-        return (a + b)%MOD;
+        return a + b;
     }
 };
 
 int main(){
     int n, q;
     cin >> n >> q;
-    vector<long long> v(n);
-    for(int i = 0; i < n; i++) cin >> v[i];
+    vector<Node> v(n);
+    Node fib(1, 1, 0);
+    for(int i = 0; i < n; i++){
+        int x;
+        cin >> x;
+        v[i] = fib ^ x;
+    }
     LazySeg<LazyNode> seg(v, n);
     while(q--){
-        int t, l, r;
-        cin >> t >> l >> r;
-        r--;
-        if(t == 0){
-            int b, c;
-            cin >> b >> c;
-            seg.update(l, r, {b, c});
+        int t, a, b;
+        cin >> t >> a >> b;
+        a--, b--;
+        if(t == 1){
+            int x;
+            cin >> x;
+            seg.update(a, b, fib ^ x);
         } else {
-            cout << seg.query(l, r) << endl;
+            cout << seg.query(a, b).b << "\n";
         }
     }
 }

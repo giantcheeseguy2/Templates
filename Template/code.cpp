@@ -30,5 +30,4 @@ void setIO() {
 
 int main(){
     setIO();
-    
 }
