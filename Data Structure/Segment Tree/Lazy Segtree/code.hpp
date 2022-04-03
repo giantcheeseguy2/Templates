@@ -1,37 +1,38 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-template <class Base>
-struct LazySeg : public Base {
-    using T = typename Base::T
-    using Base::merge;
-    using Base::apply;
-    using Base::empty;
+template <class Node>
+struct LazySeg : public Node {
+    using T = typename Node::T;
+    using L = typename Node::L;
+    using Node::merge;
+    using Node::apply;
+    using Node::empty;
 
     int n;
     vector<T> seg;
-    vector<T> tag;
+    vector<L> tag;
 
-    void build(vector<T> &v, int l = 0, int r = n - 1, int cur = 0){
+    void build(vector<T> &v, int l, int r, int cur){
         if(l == r){
-            seg[cur] = arr[l];
+            tag[cur] = empty;
+            seg[cur] = v[l];
             return;
         }
         int mid = (l + r)/2;
-        build(arr, l, mid, cur*2 + 1);
-        build(arr, mid + 1, r, cur*2 + 2);
+        build(v, l, mid, cur*2 + 1);
+        build(v, mid + 1, r, cur*2 + 2);
         seg[cur] = merge(seg[cur*2 + 1], seg[cur*2 + 2]);
+        tag[cur] = empty;
     }
 
-    void init(vector<T> &v, int n){
-        seg.resize(4*_n);
-        tag.assign(4*_n, empty);
-        build(v);
+    void init(vector<T> &v, int _n){
+        n = _n;
+        seg.resize(4*n);
+        tag.resize(4*n);
+        build(v, 0, n - 1, 0);
     }
 
-    void init(T segVal, int n){
-        vector<T> v(n, segVal);
-        init(v, n);
+    void init(T segVal, int _n){
+        vector<T> v(_n, segVal);
+        init(v, _n);
     }
 
     void push_down(int cur, int l, int r){
@@ -42,7 +43,7 @@ struct LazySeg : public Base {
         tag[cur] = empty;
     }
 
-    void update(int l, int r, T v, int ul = 0, int ur = n - 1, int cur = 0){
+    void update(int l, int r, L v, int ul, int ur, int cur){
         if(l <= ul && ur <= r){
             apply(seg[cur], tag[cur], v, ul, ur);
             return;
@@ -54,12 +55,20 @@ struct LazySeg : public Base {
         seg[cur] = merge(seg[cur*2 + 1], seg[cur*2 + 2]);
     }
 
-    T query(int l, int r, int ul = 0, int ur = n - 1, int cur = 0){
+    T query(int l, int r, int ul, int ur, int cur){
         if(l <= ul && ur <= r) return seg[cur];
         int mid = (ul + ur)/2;
         push_down(cur, ul, ur);
         if(r <= mid) return query(l, r, ul, mid, cur*2 + 1);
         if(l > mid) return query(l, r, mid + 1, ur, cur*2 + 2);
         return merge(query(l, r, ul, mid, cur*2 + 1), query(l, r, mid + 1, ur, cur*2 + 2));
+    }
+
+    void update(int l, int r, L v){
+        update(l, r, v, 0, n - 1, 0);
+    }
+
+    T query(int l, int r){
+        return query(l, r, 0, n - 1, 0);
     }
 };
