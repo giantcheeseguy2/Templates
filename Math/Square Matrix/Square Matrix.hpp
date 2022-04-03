@@ -64,4 +64,25 @@ struct Matrix {
         }
         return this;
     }
+
+    Matrix<T> operator - (const Matrix<T> &x){
+        Matrix<T> ret(n, 0);
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                ret[i][j] = mat[i][j] - x[i][j];
+                if(MOD != -1) ret[i][j] += mod, ret[i][j] %= mod;
+            }
+        }
+        return ret;
+    }
+
+    Matrix<T> &operator -= (const Matrix<T> &x){
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                mat[i][j] -= x[i][j];
+                if(MOD != -1) mat[i][j] += mod, mat[i][j] %= mod;
+            }
+        }
+        return this;
+    }
 };
