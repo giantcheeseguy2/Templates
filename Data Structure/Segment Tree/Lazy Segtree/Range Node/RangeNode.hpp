@@ -6,10 +6,11 @@ struct RangeNode {
     const L empty = 0;
 
     void apply(T &a, L &b, L c, int l, int r){
-        
+        a += c;
+        b += c;
     }
 
     T merge(T a, T b){
-        return ;
+        return a + b;
     }
 };

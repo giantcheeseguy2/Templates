@@ -14,9 +14,9 @@ typedef pair<int, int> pii;
 typedef pair<ll, ll> pll;
 typedef pair<ld, ld> pld;
 
-const int inf = 1e9;
-const ll llinf = 1e18;
-const int mod = 1e9 + 7;
+const int INF = 1e9;
+const ll LLINF = 1e18;
+const int MOD = 1e9 + 7;
 
 template<class K> using sset =  tree<K, null_type, less<K>, rb_tree_tag, tree_order_statistics_node_update>;
 
