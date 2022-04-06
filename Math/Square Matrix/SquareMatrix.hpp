@@ -4,6 +4,10 @@ struct Matrix {
     vector<vector<T>> mat;
     T MOD = -1;
 
+    Matrix(){
+
+    }
+
     Matrix(int _n, T mod){
         n = _n;
         MOD = mod;
@@ -15,7 +19,7 @@ struct Matrix {
         n = _n;
         MOD = mod;
         mat.assign(n, vector<T>(n, v));
-    } 
+    }
 
     vector<T>& operator [] (int x){
         assert(x < n);
@@ -29,20 +33,12 @@ struct Matrix {
         return mat[x];
     }
 
-    Matrix& operator=(const Matrix<T>& x){
-        if(this == &x) return *this;
-        n = x.n;
-        mat = x.mat;
-        MOD = x.MOD;
-        return *this;
-    }
-
     Matrix operator*(const Matrix<T> &x){
         Matrix<T> ret(n, 0, MOD);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 for(int k = 0; k < n; k++){
-                    if(MOD > 0) (ret[i][j] += (long long)mat[i][k]*x[k][j]) %= MOD;
+                    if(MOD > 0) (ret[i][j] += (long long)mat[i][k]*x[k][j]%MOD) %= MOD;
                     else ret[i][j] += (long long)mat[i][k]*x[k][j];
                 }
             }

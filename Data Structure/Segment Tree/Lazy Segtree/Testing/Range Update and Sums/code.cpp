@@ -1,11 +1,12 @@
-#pragma GCC optimize("Ofast,unroll-loops")
+//https://cses.fi/problemset/task/1735
+#pragma GCC optimize("O2,unroll-loops")
 #pragma GCC target("avx2,bmi2,popcnt,lzcnt")
 #include <bits/stdc++.h>
 using namespace std;
 
 template <class Node>
 struct LazySeg : public Node {
- 
+
     using T = typename Node::T;
     using L = typename Node::L;
     using Node::merge;
@@ -13,44 +14,46 @@ struct LazySeg : public Node {
     using Node::apply_tag;
     using Node::segEmpty;
     using Node::tagEmpty;
- 
+
     private:
+
         int n, size, log;
         vector<T> seg;
         vector<L> tag;
         vector<pair<int, int>> range;
- 
+
         void apply(int x, L v, int l, int r){
-            seg[x] = apply_seg(seg[x], v, l, r);
-            if(x < size) tag[x] = apply_tag(tag[x], v, l, r);
+            apply_seg(seg[x], v, l, r);
+            if(x < size) apply_tag(tag[x], v, l, r);
         }
- 
+
         void push_down(int x){
             if(tag[x] == tagEmpty) return;
             apply(x << 1, tag[x], range[x << 1].first, range[x << 1].second);
             apply(x << 1 | 1, tag[x], range[x << 1 | 1].first, range[x << 1 | 1].second);
             tag[x] = tagEmpty;
         }
- 
+
         void comb(int x){
             range[x].first = range[x << 1].first;
             range[x].second = range[x << 1 | 1].second;
             seg[x] = merge(seg[x << 1], seg[x << 1 | 1]);
         }
- 
+
         void push_down_point(int x){
             for(int i = log; i >= 1 + __builtin_ctz(x); i--) push_down(x >> i);
         }
- 
+
         void update_point(int x){
             for(int i = 1 + __builtin_ctz(x); i <= log; i++) comb(x >> i);
         }
- 
+
     public:
+
         LazySeg(){
- 
+
         }
- 
+
         LazySeg(const vector<T> &v){
             n = v.size();
             log = 0;
@@ -62,10 +65,11 @@ struct LazySeg : public Node {
             for(int i = 0; i < n; i++){
                 seg[size + i] = v[i];
             }
-            for(int i = 0; i < size; i++) range[i + size] ={i, i};
+            for(int i = 0; i < size; i++) range[i + size] = {i, i};
             for(int i = size - 1; i >= 1; i--) comb(i);
         } 
- 
+
+
         void update(int l, int r, L v){
             l += size, r += size + 1;
             push_down_point(l);
@@ -77,99 +81,54 @@ struct LazySeg : public Node {
             update_point(l);
             update_point(r);
         }
- 
-        int query(int l, int r){
-            int ret = 0;
+
+        T query(int l, int r){
+            T ret = segEmpty;
             l += size, r += size + 1;
             push_down_point(l);
             push_down_point(r);
             for(; l < r; l >>= 1, r >>= 1){
-                if(l & 1) (ret += seg[l++].b) %= 1000000007;
-                if(r & 1) (ret += seg[--r].b) %= 1000000007;
+                if(l & 1) ret = merge(ret, seg[l++]);
+                if(r & 1) ret = merge(ret, seg[--r]);
             }
             return ret;
         }
- 
+
         friend ostream& operator << (ostream &out, LazySeg<Node> &v){
             out << "[";
             for(int i = 0; i < v.n; i++){
                 if(i) cout << ", ";
                 out << v.query(i, i);
             }
-            out << "]\n";
+            cout << "]\n";
             return out;
         }
 };
 
-const int mod = 1e9 + 7;
- 
-struct Node {  
- 
-    long long a, b, c;
- 
-    Node(){
- 
-    }
- 
-    Node(long long _a, long long _b, long long _c){
-        a = _a;
-        b = _b;
-        c = _c;
-    }
- 
-    Node &operator=(const Node &v){
-        a = v.a;
-        b = v.b;
-        c = v.c;
-        return *this;
-    }
- 
-    Node &operator*=(const Node &v){
-        Node ret = Node((((v.a*a)%mod) + ((v.b*b)%mod))%mod, (((v.b*a)%mod) + ((v.c*b)%mod))%mod, (((v.b*b)%mod) + ((v.c*c)%mod))%mod);
-        a = ret.a;
-        b = ret.b;
-        c = ret.c;
-        return *this;
-    }
- 
-    Node operator+(const Node &v){
-        return Node((a + v.a)%mod, (b + v.b)%mod, (c + v.c)%mod);
-    }
- 
-    Node operator^(int x){
-        Node ret(1, 0, 1);
-        Node prod(1, 1, 0);
-        while(x){
-            if(x%2 == 1) ret *= prod;
-            prod *= prod;
-            x /= 2;
-        }
-        return ret;
-    }
- 
-    friend bool operator==(const Node &a, const Node &b){
-        return a.a == b.a && a.b == b.b && a.c == b.c;
-    }
-};
-
 struct LazyNode {
- 
-    using T = Node;
-    using L = Node;
- 
-    const L tagEmpty = Node(1, 0, 1);
-    const T segEmpty = Node(0, 0, 0);
- 
-    T apply_seg(T a, L b, int l, int r){
-        a *= b;
-        return a;
+
+    using T = long long;
+    using L = pair<long long, long long>;
+
+    const L tagEmpty = {0, 0};
+    const T segEmpty = 0;
+
+    void apply_seg(T& a, L b, int l, int r){
+        if(b.first) a = b.first*(r - l + 1);
+        if(b.second) a += b.second*(r - l + 1);
     }
- 
-    L apply_tag(L a, L b, int l, int r){
-        a *= b;
-        return a;
+
+    void apply_tag(L& a, L b, int l, int r){
+        if(b.first){
+            a.first = b.first;
+            a.second = 0;
+        }
+        if(b.second){
+            if(a.first) a.first += b.second;
+            else a.second += b.second;
+        }
     }
- 
+
     T merge(T a, T b){
         return a + b;
     }
@@ -194,24 +153,23 @@ int main(){
     setIO();
     int n, q;
     scan(n), scan(q);
-    vector<Node> v(n);
-    Node fib(1, 1, 0);
-    for(int i = 0; i < n; i++){
-        int x;
-        scan(x);
-        v[i] = fib ^ x;
-    }
+    vector<long long> v(n);
+    for(int i = 0; i < n; i++) scan(v[i]);
     LazySeg<LazyNode> seg(v);
     while(q--){
-        int t, a, b;
-        scan(t), scan(a), scan(b);
-        a--, b--;
+        int t, l, r;
+        scan(t), scan(l), scan(r);
+        l--, r--;
         if(t == 1){
             int x;
             scan(x);
-            seg.update(a, b, fib ^ x);
+            seg.update(l, r, {0, x});
+        } else if(t == 2){
+            int x; 
+            scan(x);
+            seg.update(l, r, {x, 0});
         } else {
-            cout << seg.query(a, b) << "\n";
+            cout << seg.query(l, r) << "\n";
         }
     }
 }

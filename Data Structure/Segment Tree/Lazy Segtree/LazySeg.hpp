@@ -1,88 +1,97 @@
 template <class Node>
 struct LazySeg : public Node {
+
     using T = typename Node::T;
     using L = typename Node::L;
     using Node::merge;
-    using Node::apply;
-    using Node::empty;
+    using Node::apply_seg;
+    using Node::apply_tag;
+    using Node::segEmpty;
+    using Node::tagEmpty;
 
-    int n;
-    vector<T> seg;
-    vector<L> tag;
+    private:
+        int n, size, log;
+        vector<T> seg;
+        vector<L> tag;
+        vector<pair<int, int>> range;
 
-    LazySeg(){
-
-    } 
-
-    LazySeg(const vector<T> &v, int _n){
-        n = _n;
-        seg.resize(4*n);
-        tag.resize(4*n);
-        build(v, 0, n - 1, 0);
-    }
-
-    LazySeg(T segVal, int _n){
-        vector<T> v(_n, segVal);
-        LazySeg(v, _n);
-    }
-
-    void build(const vector<T> &v, int l, int r, int cur){
-        if(l == r){
-            tag[cur] = empty;
-            seg[cur] = v[l];
-            return;
+        void apply(int x, L v, int l, int r){
+            seg[x] = apply_seg(seg[x], v, l, r);
+            if(x < size) tag[x] = apply_tag(tag[x], v, l, r);
         }
-        int mid = (l + r)/2;
-        build(v, l, mid, cur*2 + 1);
-        build(v, mid + 1, r, cur*2 + 2);
-        seg[cur] = merge(seg[cur*2 + 1], seg[cur*2 + 2]);
-        tag[cur] = empty;
-    }
 
-    void push_down(int cur, int l, int r){
-        if(tag[cur] == empty) return;
-        int mid = (l + r)/2;
-        apply(seg[cur*2 + 1], tag[cur*2 + 1], tag[cur], l, mid);
-        apply(seg[cur*2 + 2], tag[cur*2 + 2], tag[cur], mid + 1, r);
-        tag[cur] = empty;
-    }
-
-    void update(int l, int r, const L &v, int ul, int ur, int cur){
-        if(l <= ul && ur <= r){
-            apply(seg[cur], tag[cur], v, ul, ur);
-            return;
+        void push_down(int x){
+            if(tag[x] == tagEmpty) return;
+            apply(x << 1, tag[x], range[x << 1].first, range[x << 1].second);
+            apply(x << 1 | 1, tag[x], range[x << 1 | 1].first, range[x << 1 | 1].second);
+            tag[x] = tagEmpty;
         }
-        push_down(cur, ul, ur);
-        int mid = (ul + ur)/2;
-        if(l <= mid) update(l, r, v, ul, mid, cur*2 + 1);
-        if(r > mid) update(l, r, v, mid + 1, ur, cur*2 + 2);
-        seg[cur] = merge(seg[cur*2 + 1], seg[cur*2 + 2]);
-    }
 
-    T query(int l, int r, int ul, int ur, int cur){
-        if(l <= ul && ur <= r) return seg[cur];
-        int mid = (ul + ur)/2;
-        push_down(cur, ul, ur);
-        if(r <= mid) return query(l, r, ul, mid, cur*2 + 1);
-        if(l > mid) return query(l, r, mid + 1, ur, cur*2 + 2);
-        return merge(query(l, r, ul, mid, cur*2 + 1), query(l, r, mid + 1, ur, cur*2 + 2));
-    }
-
-    void update(int l, int r, const L &v){
-        update(l, r, v, 0, n - 1, 0);
-    }
-
-    T query(int l, int r){
-        return query(l, r, 0, n - 1, 0);
-    }
-
-    friend ostream& operator << (ostream &out, LazySeg<Node> &v){
-        out << "[";
-        for(int i = 0; i < v.n; i++){
-            if(i) cout << ", ";
-            out << v.query(i, i);
+        void comb(int x){
+            range[x].first = range[x << 1].first;
+            range[x].second = range[x << 1 | 1].second;
+            seg[x] = merge(seg[x << 1], seg[x << 1 | 1]);
         }
-        cout << "]\n";
-        return out;
-    }
+
+        void push_down_point(int x){
+            for(int i = log; i >= 1 + __builtin_ctz(x); i--) push_down(x >> i);
+        }
+
+        void update_point(int x){
+            for(int i = 1 + __builtin_ctz(x); i <= log; i++) comb(x >> i);
+        }
+
+    public:
+        LazySeg(){
+
+        }
+
+        LazySeg(const vector<T> &v){
+            n = v.size();
+            log = 0;
+            while((1 << log) < n) log++;
+            size = (1 << log);
+            tag.assign(size, tagEmpty);
+            seg.assign(2*size, segEmpty);
+            range.resize(2*size);
+            for(int i = 0; i < n; i++){
+                seg[size + i] = v[i];
+            }
+            for(int i = 0; i < size; i++) range[i + size] ={i, i};
+            for(int i = size - 1; i >= 1; i--) comb(i);
+        } 
+
+        void update(int l, int r, L v){
+            l += size, r += size + 1;
+            push_down_point(l);
+            push_down_point(r);
+            for(int ll = l, rr = r; ll < rr; ll >>= 1, rr >>= 1){
+                if(ll & 1) apply(ll, v, range[ll].first, range[ll].second), ll++;
+                if(rr & 1) --rr, apply(rr, v, range[rr].first, range[rr].second);
+            }
+            update_point(l);
+            update_point(r);
+        }
+
+        T query(int l, int r){
+            T ret = segEmpty;
+            l += size, r += size + 1;
+            push_down_point(l);
+            push_down_point(r);
+            for(; l < r; l >>= 1, r >>= 1){
+                if(l & 1) ret = merge(ret, seg[l++]);
+                if(r & 1) ret = merge(ret, seg[--r]);
+            }
+            return ret;
+        }
+
+        friend ostream& operator << (ostream &out, LazySeg<Node> &v){
+            out << "[";
+            for(int i = 0; i < v.n; i++){
+                if(i) cout << ", ";
+                out << v.query(i, i);
+            }
+            cout << "]\n";
+            return out;
+        }
 };

@@ -8,6 +8,10 @@ struct Matrix {
     vector<vector<T>> mat;
     T MOD = -1;
 
+    Matrix(){
+
+    }
+
     Matrix(int _n, T mod){
         n = _n;
         MOD = mod;

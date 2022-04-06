@@ -1,13 +1,17 @@
 struct LazyNode {
 
-    using T = long long;
-    using L = long long;
+    using T = int;
+    using L = int;
 
-    const L empty = 0;
+    const L tagEmpty = 0;
+    const T segEmpty = 0;
 
-    void apply(T &a, L &b, L c, int l, int r){
-        a += c;
-        b += c;
+    T apply_seg(T a, L b, int l, int r){
+        return a + b;
+    }
+
+    L apply_tag(L a, L b, int l, int r){
+        return a + b;
     }
 
     T merge(T a, T b){
