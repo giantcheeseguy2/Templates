@@ -23,13 +23,13 @@ struct Matrix {
         } 
     }
 
-    array<T, n>& operator[](int x){
+    array<T, n> &operator[](int x){
         assert(x < n);
         assert(x >= 0);
         return mat[x];
     }
 
-    const array<T, n>& operator[](int x) const {
+    const array<T, n> &operator[](int x) const {
         assert(x < n);
         assert(x >= 0);
         return mat[x];
@@ -38,8 +38,8 @@ struct Matrix {
     Matrix operator*(const Matrix<T, n> &x){
         Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                for(int k = 0; k < n; k++){
+            for(int k = 0; k < n; k++){
+                for(int j = 0; j < n; j++){
                     ret[i][j] += mat[i][k]*x[k][j];
                 }
             }
@@ -48,15 +48,7 @@ struct Matrix {
     }
 
     Matrix &operator*=(const Matrix<T, n> &x){
-        Matrix<T, n> ret(0);
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                for(int k = 0; k < n; k++){
-                    ret[i][j] += mat[i][k]*x[k][j];
-                }
-            }
-        }
-        mat = ret.mat;
+        (*this) = (*this) * x;
         return *this;
     }
 
@@ -153,7 +145,7 @@ struct Matrix {
 int main(){
     long long n;
     cin >> n;
-    Matrix<int, 4> mat(0);
+    Matrix<int, 2> mat(0);
     mat[0][0] = 1;
     mat[0][1] = 1;
     mat[1][0] = 1;

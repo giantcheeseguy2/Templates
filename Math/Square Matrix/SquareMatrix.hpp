@@ -34,8 +34,8 @@ struct Matrix {
     Matrix operator*(const Matrix<T, n> &x){
         Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                for(int k = 0; k < n; k++){
+            for(int k = 0; k < n; k++){
+                for(int j = 0; j < n; j++){
                     ret[i][j] += mat[i][k]*x[k][j];
                 }
             }
@@ -44,15 +44,7 @@ struct Matrix {
     }
 
     Matrix &operator*=(const Matrix<T, n> &x){
-        Matrix<T, n> ret(0);
-        for(int i = 0; i < n; i++){
-            for(int j = 0; j < n; j++){
-                for(int k = 0; k < n; k++){
-                    ret[i][j] += mat[i][k]*x[k][j];
-                }
-            }
-        }
-        mat = ret.mat;
+        (*this) = (*this) * x;
         return *this;
     }
 
