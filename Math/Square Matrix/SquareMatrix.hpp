@@ -1,58 +1,54 @@
-template<class T>
+template<class T, int n>
 struct Matrix { 
-    int n;
-    vector<vector<T>> mat;
-    T MOD = -1;
+
+    array<array<T, n>, n> mat;
 
     Matrix(){
-
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                mat[i][j] = (i == j);
+            }
+        }
     }
 
-    Matrix(int _n, T mod){
-        n = _n;
-        MOD = mod;
-        mat.assign(n, vector<T>(n, 0));
-        for(int i = 0; i < n; i++) mat[i][i] = 1; 
+    Matrix(T v){
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                mat[i][j] = v; 
+            }
+        } 
     }
 
-    Matrix(int _n, T v, T mod){
-        n = _n;
-        MOD = mod;
-        mat.assign(n, vector<T>(n, v));
-    }
-
-    vector<T>& operator [] (int x){
+    array<T, n> &operator[](int x){
         assert(x < n);
         assert(x >= 0);
         return mat[x];
     }
 
-    const vector<T>& operator [] (int x) const {
+    const array<T, n> &operator[](int x) const {
         assert(x < n);
         assert(x >= 0);
         return mat[x];
     }
 
-    Matrix operator*(const Matrix<T> &x){
-        Matrix<T> ret(n, 0, MOD);
+    Matrix operator*(const Matrix<T, n> &x){
+        Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 for(int k = 0; k < n; k++){
-                    if(MOD > 0) (ret[i][j] += (long long)mat[i][k]*x[k][j]%MOD) %= MOD;
-                    else ret[i][j] += (long long)mat[i][k]*x[k][j];
+                    ret[i][j] += mat[i][k]*x[k][j];
                 }
             }
         }
         return ret;
     }
 
-    Matrix operator*=(const Matrix<T> &x){
-        Matrix<T> ret(n, 0, MOD);
+    Matrix &operator*=(const Matrix<T, n> &x){
+        Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 for(int k = 0; k < n; k++){
-                    if(MOD > 0) (ret[i][j] += (long long)mat[i][k]*x[k][j]%MOD) %= MOD;
-                    else ret[i][j] += (long long)mat[i][k]*x[k][j];
+                    ret[i][j] += mat[i][k]*x[k][j];
                 }
             }
         }
@@ -60,52 +56,47 @@ struct Matrix {
         return *this;
     }
 
-    Matrix operator+(const Matrix<T> &x){
-        Matrix<T> ret(n, 0, MOD);
+    Matrix operator+(const Matrix<T, n> &x){
+        Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 ret[i][j] = mat[i][j] + x[i][j];
-                if(MOD > 0) ret[i][j] %= MOD;
             }
         }
         return ret;
     }
 
-    Matrix &operator+=(const Matrix<T> &x){
+    Matrix &operator+=(const Matrix<T, n> &x){
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 mat[i][j] += x[i][j];
-                if(MOD > 0) mat[i][j] %= MOD;
             }
         }
         return *this;
     }
 
-    Matrix operator-(const Matrix<T> &x){
-        Matrix<T> ret(n, 0, MOD);
+    Matrix operator-(const Matrix<T, n> &x){
+        Matrix<T, n> ret(0);
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 ret[i][j] = mat[i][j] - x[i][j];
-                if(MOD > 0) ret[i][j] += MOD, ret[i][j] %= MOD;
             }
         }
         return ret;
     }
 
-    Matrix &operator-=(const Matrix<T> &x){
+    Matrix &operator-=(const Matrix<T, n> &x){
         for(int i = 0; i < n; i++){
             for(int j = 0; j < n; j++){
                 mat[i][j] -= x[i][j];
-                if(MOD > 0) mat[i][j] += MOD, mat[i][j] %= MOD;
             }
         }
         return *this;
     }
 
     Matrix operator^(long long x){
-        Matrix<T> ret(n, MOD);
-        Matrix<T> prod(n, 0, MOD);
-        prod = *this;
+        Matrix<T, n> ret;
+        Matrix<T, n> prod = *this;
         while(x){
             if(x%2 == 1) ret *= prod;
             prod *= prod;
@@ -115,7 +106,7 @@ struct Matrix {
     }
 
     Matrix &operator^=(long long x){
-        Matrix<T> ret(n, MOD);
+        Matrix<T, n> ret;
         while(x){
             if(x%2 == 1) ret *= (*this);
             (*this) *= (*this);
@@ -125,22 +116,28 @@ struct Matrix {
         return *this;
     }
 
-    friend bool operator==(const Matrix<T> &a, const Matrix<T> &b){
-        return a.n == b.n && a.MOD == b.MOD && a.mat == b.mat;
+    friend bool operator==(const Matrix<T, n> &a, const Matrix<T, n> &b){
+        if(a.n != b.n) return false;
+        for(int i = 0; i < n; i++){
+            for(int j = 0; j < n; j++){
+                if(a[i][j] != b[i][j]) return false;
+            }
+        }
+        return true;
     }
 
-    friend bool operator!=(const Matrix<T> &a, const Matrix<T> &b){
+    friend bool operator!=(const Matrix<T, n> &a, const Matrix<T, n> &b){
         return !(a == b);
     }
 
-    friend ostream& operator<<(ostream &out, Matrix<T> &v){
+    friend ostream& operator<<(ostream &out, Matrix<T, n> &x){
         out << "[";
-        for(int i = 0; i < v.n; i++){
+        for(int i = 0; i < x.n; i++){
             if(i) cout << "\n";
             out << "[";
-            for(int j = 0; j < v.n; j++){
+            for(int j = 0; j < x.n; j++){
                 if(j) out << ", ";
-                cout << v[i][j];
+                cout << x[i][j];
             }
             out << "]";
         }
