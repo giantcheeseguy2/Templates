@@ -3,7 +3,7 @@ struct LazySeg {
     using T = long long;
     using L = long long;
 
-    static constexpr L empty = 0;
+    const L empty = 0;
 
     static T merge(T a, T b){
         return a + b;

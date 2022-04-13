@@ -112,7 +112,7 @@ struct Modular {
         return in;
     }
 
-    string to_string(const Modular&x) { return to_string(x.val); }
+    string to_string(const Modular x) { return to_string(x.val); }
 };
 
 struct Mod { 

@@ -4,22 +4,145 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+template<class mod>
+struct Modular {
+
+    using T = typename mod::type;
+    using C = typename mod::cast;
+
+    template<class U>
+    static T norm(const U &x){
+        T ret;
+        if(-mod::mod <= x && x < mod::mod) ret = static_cast<T>(x);
+        else ret = static_cast<T>(x%mod::mod);
+        if(ret < 0) ret += mod::mod;
+        return ret;
+    }
+
+    template<class U>
+    static T fpow(U a, U b){
+        T ret = 1;
+        T prod = norm(a);
+        while(b){
+            if(b%2 == 1) ret = norm((C)ret*prod);
+            prod = norm((C)prod*prod);
+            b /= 2;
+        }
+        return ret;
+    }
+
+    T val;
+
+    Modular(){
+        val = 0;
+    }
+
+    template<class U>
+    Modular(const U &x){
+        val = norm(x);
+    }
+
+    const T &operator()() const { return val; }
+
+    template<class U>
+    explicit operator U() const { return static_cast<U>(val); } 
+
+    Modular operator-(){ return Modular<mod>(-val); }
+
+    Modular &operator+=(const Modular &x){
+        val = norm((C)val + x.val);
+        return *this;
+    }
+
+    Modular &operator-=(const Modular &x){
+        val = norm((C)val - x.val);
+        return *this;
+    }
+
+    Modular &operator*=(const Modular &x){
+        val = norm((C)val*x.val);
+        return *this;
+    }
+
+    Modular &operator/=(const Modular &x){
+        val = norm((C)val*fpow(x.val, mod::mod - 2));
+        return *this;
+    }
+
+    Modular &operator%=(const Modular &x){
+        val = val%x.val;
+        return *this;
+    }
+
+    Modular &operator++(){ return *this += 1; }
+
+    Modular &operator--(){ return *this -= 1; }
+
+    Modular operator++(int){
+        Modular<mod> ret = *this;
+        ++*this;
+        return ret;
+    }
+
+    Modular operator--(int){
+        Modular<mod> ret = *this;
+        --*this;
+        return ret;
+    }
+
+    friend Modular operator+(const Modular &a, const Modular &b){ return Modular(a.val) += b; }
+
+    friend Modular operator-(const Modular &a, const Modular &b){ return Modular(a.val) -= b; }
+
+    friend Modular operator*(const Modular &a, const Modular &b){ return Modular(a.val) *= b; }
+
+    friend Modular operator/(const Modular &a, const Modular &b){ return Modular(a.val) /= b; }
+
+    friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
+
+    friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
+
+    friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
+
+    friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
+
+    friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
+
+    friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
+
+    friend ostream &operator<<(ostream &out, Modular x){ return out << x.val; }
+
+    friend istream &operator>>(istream &in, Modular &x){ 
+        in >> x.val;
+        x.val = norm(x.val);
+        return in;
+    }
+
+    string to_string(const Modular&x) { return to_string(x.val); }
+};
+
+struct Mod { 
+    using type = int;
+    using cast = long long;
+    const static type mod = 998244353;
+};
+
+using mint = Modular<Mod>;
+
 struct LazySeg {
 
-    using T = long long;
-    using L = pair<long long, long long>;
+    using T = mint;
+    using L = pair<mint, mint>;
 
-    const int MOD = 998244353;
-
-    static constexpr L empty = {1, 0};
+    const L empty = {1, 0};
 
     static T merge(T a, T b){
-        return (a + b)%998244353;
+        return a + b;
     }
 
     static void apply(T &a, L &b, L v, int l, int r){
-        a = (v.first*a + v.second*(r - l + 1))%998244353;
-        b = {(v.first*b.first)%998244353, (v.first*b.second + v.second)%998244353};
+        a = v.first*a + v.second*(r - l + 1);
+        b = {v.first*b.first, v.first*b.second + v.second};
     }
 
     private:
@@ -100,34 +223,18 @@ struct LazySeg {
         }
 };
 
-const int BUFSIZE = 20 << 20;
-char Buf[BUFSIZE + 1], *buf = Buf;
-
-template<class T>
-void scan(T &x){
-    int neg = 1;
-    for(x = 0; *buf < '0' || *buf > '9'; buf++) if(*buf == '-') neg = -1;
-    while(*buf >= '0' && *buf <= '9') x = x*10 + (*buf - '0'), buf++;
-    x *= neg;
-}
-
-void setIO(){
-    fread(Buf, 1, BUFSIZE, stdin);
-}
-
 int main(){
-    setIO();
     int n, q;
-    scan(n), scan(q);
-    vector<long long> v(n);
-    for(int i = 0; i < n; i++) scan(v[i]);
+    cin >> n >> q;
+    vector<mint> v(n);
+    for(int i = 0; i < n; i++) cin >> v[i];
     LazySeg seg(v);
     while(q--){
         int t, l, r;
-        scan(t), scan(l), scan(r);
+        cin >> t >> l >> r;
         if(t == 0){
             int b, c;
-            scan(b), scan(c);
+            cin >> b >> c;
             seg.update(l, r - 1, {b, c});
         } else {
             cout << seg.query(l, r - 1) << "\n";

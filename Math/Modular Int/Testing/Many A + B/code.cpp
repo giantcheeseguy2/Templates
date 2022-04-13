@@ -108,7 +108,7 @@ struct Modular {
 
     friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
 
-    friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
+    friend ostream &operator<<(ostream &out, Modular x){ return out << x.val; }
 
     friend istream &operator>>(istream &in, Modular &x){ 
         in >> x.val;
@@ -133,7 +133,6 @@ int main(){
     while(t--){
         mint a, b;
         cin >> a >> b;
-        a += b;
-        cout << a << "\n";
+        cout << a + b << "\n";
     }
 }
