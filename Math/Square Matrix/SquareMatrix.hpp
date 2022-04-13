@@ -86,7 +86,8 @@ struct Matrix {
         return *this;
     }
 
-    Matrix operator^(long long x){
+    template<class U>
+    Matrix operator^(U x){
         Matrix<T, n> ret;
         Matrix<T, n> prod = *this;
         while(x){
@@ -97,7 +98,8 @@ struct Matrix {
         return ret;
     }
 
-    Matrix &operator^=(long long x){
+    template<class U>
+    Matrix &operator^=(U x){
         Matrix<T, n> ret;
         while(x){
             if(x%2 == 1) ret *= (*this);

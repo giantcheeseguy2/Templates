@@ -1,3 +1,7 @@
+//https://judge.yosupo.jp/problem/many_aplusb
+#include <bits/stdc++.h>
+using namespace std;
+
 template<class mod>
 struct Modular {
 
@@ -39,7 +43,7 @@ struct Modular {
     const T &operator()() const { return val; }
 
     template<class U>
-	explicit operator U() const { return static_cast<U>(val); } 
+    explicit operator U() const { return static_cast<U>(val); } 
 
     Modular operator-(){ return Modular<mod>(-val); }
 
@@ -92,17 +96,17 @@ struct Modular {
 
     friend Modular operator/(const Modular &a, const Modular &b){ return Modular(a.val) /= b; }
 
-	friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
+    friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
 
-	friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
+    friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
 
-	friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
+    friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
 
-	friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
+    friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
 
-	friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
+    friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
 
-	friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
+    friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
 
     friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
 
@@ -112,9 +116,20 @@ struct Modular {
 };
 
 struct Mod { 
-    using type = int;
+    using type = long long;
     using cast = long long;
-    const static type mod = 1000000007; 
+    const static type mod = 2000000000000000001; 
 };
 
 using mint = Modular<Mod>;
+
+int main(){
+    int t;
+    cin >> t;
+    while(t--){
+        mint a, b;
+        cin >> a >> b;
+        a += b;
+        cout << a << "\n";
+    }
+}

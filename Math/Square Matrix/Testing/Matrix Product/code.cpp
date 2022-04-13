@@ -1,4 +1,3 @@
-//https://cses.fi/problemset/task/1722
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -153,7 +152,7 @@ struct Modular {
     template<class U>
     static T norm(const U &x){
         T ret;
-        if(-mod::mod <= x && x < mod::mod) ret = static_cast<T>(x);
+        if(-mod::mod <= x && x <= mod::mod) ret = static_cast<T>(x);
         else ret = static_cast<T>(x%mod::mod);
         if(ret < 0) ret += mod::mod;
         return ret;
@@ -185,7 +184,7 @@ struct Modular {
     const T &operator()() const { return val; }
 
     template<class U>
-   explicit operator U() const { return static_cast<U>(val); } 
+    explicit operator U() const { return static_cast<U>(val); } 
 
     Modular operator-(){ return Modular<mod>(-val); }
 
@@ -240,6 +239,16 @@ struct Modular {
 
     friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
 
+    friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
+
+    friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
+
+    friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
+
+    friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
+
+    friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
+
     friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
 
     friend istream &operator>>(istream &in, Modular &x) { return in >> x.val; }
@@ -250,18 +259,23 @@ struct Modular {
 struct Mod { 
     using type = int;
     using cast = long long;
-    const static type mod = 1000000007; 
+    const static type mod = 998244353;
 };
 
 using mint = Modular<Mod>;
 
+Matrix<mint, 1024> a, b, ans;
+
 int main(){
-    long long n;
-    cin >> n;
-    Matrix<mint, 2> mat(0);
-    mat[0][0] = 1;
-    mat[0][1] = 1;
-    mat[1][0] = 1;
-    mint a = 1, b = 2;
-    cout << (mat ^ n)[0][1] << endl;
+    int n, m, k;
+    cin >> n >> m >> k;
+    for(int i = 0; i < n; i++) for(int j = 0; j < m; j++) cin >> a[i][j];
+    for(int i = 0; i < m; i++) for(int j = 0; j < k; j++) cin >> b[i][j];
+    ans = a * b;
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < k; j++){
+            cout << ans[i][j] << " ";
+        }
+        cout << endl;
+    }
 }
