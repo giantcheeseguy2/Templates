@@ -7,7 +7,7 @@ struct Modular {
     template<class U>
     static T norm(const U &x){
         T ret;
-        if(-mod::mod <= x && x <= mod::mod) ret = static_cast<T>(x);
+        if(-mod::mod <= x && x < mod::mod) ret = static_cast<T>(x);
         else ret = static_cast<T>(x%mod::mod);
         if(ret < 0) ret += mod::mod;
         return ret;
@@ -39,7 +39,7 @@ struct Modular {
     const T &operator()() const { return val; }
 
     template<class U>
-	explicit operator U() const { return static_cast<U>(val); } 
+    explicit operator U() const { return static_cast<U>(val); } 
 
     Modular operator-(){ return Modular<mod>(-val); }
 
@@ -49,7 +49,7 @@ struct Modular {
     }
 
     Modular &operator-=(const Modular &x){
-        val = norm((C)val - x.val + mod::mod);
+        val = norm((C)val - x.val);
         return *this;
     }
 
@@ -92,21 +92,25 @@ struct Modular {
 
     friend Modular operator/(const Modular &a, const Modular &b){ return Modular(a.val) /= b; }
 
-	friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
+    friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
 
-	friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
+    friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
 
-	friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
+    friend bool operator>(const Modular &a, const Modular &b){ return a.val > b.val; }
 
-	friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
+    friend bool operator>=(const Modular &a, const Modular &b){ return a.val >= b.val; }
 
-	friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
+    friend bool operator==(const Modular &a, const Modular &b){ return a.val == b.val; }
 
-	friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
+    friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
 
     friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
 
-    friend istream &operator>>(istream &in, Modular &x) { return in >> x.val; }
+    friend istream &operator>>(istream &in, Modular &x){ 
+        in >> x.val;
+        x.val = norm(x.val);
+        return in;
+    }
 
     string to_string(const Modular&x) { return to_string(x.val); }
 };

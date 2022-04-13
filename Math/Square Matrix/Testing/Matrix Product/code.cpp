@@ -152,7 +152,7 @@ struct Modular {
     template<class U>
     static T norm(const U &x){
         T ret;
-        if(-mod::mod <= x && x <= mod::mod) ret = static_cast<T>(x);
+        if(-mod::mod <= x && x < mod::mod) ret = static_cast<T>(x);
         else ret = static_cast<T>(x%mod::mod);
         if(ret < 0) ret += mod::mod;
         return ret;
@@ -194,7 +194,7 @@ struct Modular {
     }
 
     Modular &operator-=(const Modular &x){
-        val = norm((C)val - x.val + mod::mod);
+        val = norm((C)val - x.val);
         return *this;
     }
 
@@ -251,7 +251,11 @@ struct Modular {
 
     friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
 
-    friend istream &operator>>(istream &in, Modular &x) { return in >> x.val; }
+    friend istream &operator>>(istream &in, Modular &x){ 
+        in >> x.val;
+        x.val = norm(x.val);
+        return in;
+    }
 
     string to_string(const Modular&x) { return to_string(x.val); }
 };
@@ -259,12 +263,12 @@ struct Modular {
 struct Mod { 
     using type = int;
     using cast = long long;
-    const static type mod = 998244353;
+    const static type mod = 998244353; 
 };
 
 using mint = Modular<Mod>;
 
-Matrix<mint, 1024> a, b, ans;
+Matrix<mint, 1024> a(0), b(0), ans(0);
 
 int main(){
     int n, m, k;

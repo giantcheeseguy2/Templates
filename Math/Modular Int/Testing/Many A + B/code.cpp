@@ -110,7 +110,11 @@ struct Modular {
 
     friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
 
-    friend istream &operator>>(istream &in, Modular &x) { return in >> x.val; }
+    friend istream &operator>>(istream &in, Modular &x){ 
+        in >> x.val;
+        x.val = norm(x.val);
+        return in;
+    }
 
     string to_string(const Modular&x) { return to_string(x.val); }
 };
