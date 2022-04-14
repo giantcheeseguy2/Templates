@@ -7,19 +7,18 @@ struct Modular {
     template<class U>
     static T norm(const U &x){
         T ret;
-        if(-mod::mod <= x && x < mod::mod) ret = static_cast<T>(x);
-        else ret = static_cast<T>(x%mod::mod);
+        if(-mod::mod <= x && x <= mod::mod) ret = (T)x;
+        else ret = (T)(x%mod::mod);
         if(ret < 0) ret += mod::mod;
         return ret;
     }
 
     template<class U>
-    static T fpow(U a, U b){
+    static T fpow(T a, U b){
         T ret = 1;
-        T prod = norm(a);
         while(b){
-            if(b%2 == 1) ret = norm((C)ret*prod);
-            prod = norm((C)prod*prod);
+            if(b%2 == 1) ret = norm((C)ret*a);
+            a = norm((C)a*a);
             b /= 2;
         }
         return ret;
@@ -49,7 +48,7 @@ struct Modular {
     }
 
     Modular &operator-=(const Modular &x){
-        val = norm((C)val - x.val);
+        val = norm((C)val - x.val + mod::mod);
         return *this;
     }
 
@@ -65,6 +64,13 @@ struct Modular {
 
     Modular &operator%=(const Modular &x){
         val = val%x.val;
+        return *this;
+    }
+
+    template<class U>
+    Modular &operator^=(const U &x){
+        assert(("be careful when raising to a modded power", typeid(x) != typeid(*this)));
+        val = fpow(val, x);
         return *this;
     }
 
@@ -92,6 +98,11 @@ struct Modular {
 
     friend Modular operator/(const Modular &a, const Modular &b){ return Modular(a.val) /= b; }
 
+    friend Modular operator%(const Modular &a, const Modular &b){ return Modular(a.val) %= b; }
+
+    template<class U>
+    friend Modular operator^(const Modular &a, const U &b){ return Modular(a.val) ^= b; }
+
     friend bool operator<(const Modular &a, const Modular &b){ return a.val < b.val; }
 
     friend bool operator<=(const Modular &a, const Modular &b){ return a.val <= b.val; }
@@ -104,7 +115,7 @@ struct Modular {
 
     friend bool operator!=(const Modular &a, const Modular &b){ return a.val != b.val; }
 
-    friend ostream &operator<<(ostream &out, Modular &x){ return out << x.val; }
+    friend ostream &operator<<(ostream &out, Modular x){ return out << x.val; }
 
     friend istream &operator>>(istream &in, Modular &x){ 
         in >> x.val;
@@ -112,13 +123,13 @@ struct Modular {
         return in;
     }
 
-    string to_string(const Modular x) { return to_string(x.val); }
+    string to_string(const Modular&x) { return to_string(x.val); }
 };
 
 struct Mod { 
     using type = int;
     using cast = long long;
-    const static type mod = 1000000007; 
+    const static type mod = 1000000007;
 };
 
 using mint = Modular<Mod>;
