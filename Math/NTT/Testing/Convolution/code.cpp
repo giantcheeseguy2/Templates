@@ -1,4 +1,4 @@
-//https://loj.ac/p/108
+//https://judge.yosupo.jp/problem/convolution_mod
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -131,7 +131,7 @@ struct Modular {
 };
 
 struct Mod { 
-    using type = long long;
+    using type = int;
     using cast = long long;
     const static type mod = 998244353;
 };
@@ -174,9 +174,9 @@ namespace NTT {
                 for(int k = 0; k < i/2; k++){
                     mint a = v[j + k], b = root*v[j + i/2 + k];
                     //computes the left half of the segment
-                    v[j + k + i/2] = a - b;
                     v[j + k] = a + b;
                     //computes the right half of the segment
+                    v[j + k + i/2] = a - b;
                     //increases the current root of unity
                     root *= mult;
                 }
@@ -212,7 +212,7 @@ namespace NTT {
         ntt(aa, -1, proot);
         //extracts the answer from the final polynomial. The values must be rounded due to double precision
         vector<T> ret(n);
-        for(int i = 0; i < a.size() + b.size() - 1; i++){
+        for(int i = 0; i < n; i++){
             ret[i] = aa[i]();
         }
         return ret;
@@ -222,7 +222,6 @@ namespace NTT {
 int main(){
     int n, m;
     cin >> n >> m;
-    n++, m++;
     vector<int> v1(n), v2(m);
     for(int i = 0; i < n; i++) cin >> v1[i];
     for(int i = 0; i < m; i++) cin >> v2[i];

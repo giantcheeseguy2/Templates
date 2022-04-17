@@ -5,20 +5,11 @@ struct Modular {
     using C = typename mod::cast;
 
     template<class U>
-    static T norm(const U &x){
-        T ret;
-        if(-mod::mod <= x && x <= mod::mod) ret = (T)x;
-        else ret = (T)(x%mod::mod);
-        if(ret < 0) ret += mod::mod;
-        return ret;
-    }
-
-    template<class U>
     static T fpow(T a, U b){
         T ret = 1;
         while(b){
-            if(b%2 == 1) ret = norm((C)ret*a);
-            a = norm((C)a*a);
+            if(b%2 == 1) ret = (C)ret*a%mod::mod;
+            a = (C)a*a%mod::mod;
             b /= 2;
         }
         return ret;
@@ -32,7 +23,8 @@ struct Modular {
 
     template<class U>
     Modular(const U &x){
-        val = norm(x);
+        val = x%mod::mod;
+        if(val < 0) val += mod::mod;
     }
 
     const T &operator()() const { return val; }
@@ -43,22 +35,22 @@ struct Modular {
     Modular operator-(){ return Modular<mod>(-val); }
 
     Modular &operator+=(const Modular &x){
-        val = norm((C)val + x.val);
+        val = (val + x.val)%mod::mod;
         return *this;
     }
 
     Modular &operator-=(const Modular &x){
-        val = norm((C)val - x.val + mod::mod);
+        val = (val - x.val + mod::mod)%mod::mod;
         return *this;
     }
 
     Modular &operator*=(const Modular &x){
-        val = norm((C)val*x.val);
+        val = (C)val*x.val%mod::mod;
         return *this;
     }
 
     Modular &operator/=(const Modular &x){
-        val = norm((C)val*fpow(x.val, mod::mod - 2));
+        val = (C)val*fpow(x.val, mod::mod - 2)%mod::mod;
         return *this;
     }
 
@@ -119,7 +111,8 @@ struct Modular {
 
     friend istream &operator>>(istream &in, Modular &x){ 
         in >> x.val;
-        x.val = norm(x.val);
+        x.val = x.val%mod::mod;
+        if(x.val < 0) x.val += mod::mod;
         return in;
     }
 

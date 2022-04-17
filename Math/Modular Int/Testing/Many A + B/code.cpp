@@ -11,7 +11,7 @@ struct Modular {
     template<class U>
     static T norm(const U &x){
         T ret;
-        if(-mod::mod <= x && x <= mod::mod) ret = (T)x;
+        if(-mod::mod <= x && x < mod::mod) ret = (T)x;
         else ret = (T)(x%mod::mod);
         if(ret < 0) ret += mod::mod;
         return ret;

@@ -5,6 +5,7 @@ namespace NTT {
      *      998244353 (9e8)
      *      2748779069441 (2e12)
      *      4179340454199820289 (4e18)
+     *  More mods: https://pastebin.com/T4YynxWM
      */
 
     //Returns the bitwise reverse of x using only the first mx bits
@@ -53,7 +54,7 @@ namespace NTT {
     //DFT(A * B) = DFT(A) * DFT(B)
     //A * B = invDFT(DFT(A) * DFT(B))
     template<class T>
-    static vector<T> mult(const vector<T> &a, const vector<T> &b, T mod = 0){
+    static vector<T> mult(const vector<T> &a, const vector<T> &b){
         //resizes the answer to a power of 2
         int n = 1;
         while(n < a.size() + b.size()) n *= 2;
@@ -71,8 +72,8 @@ namespace NTT {
         //returns a to a polynomial, a = invDFT(a)
         ntt(aa, -1, proot);
         //extracts the answer from the final polynomial. The values must be rounded due to double precision
-        vector<T> ret(n);
-        for(int i = 0; i < n; i++){
+        vector<T> ret(a.size() + b.size() - 1);
+        for(int i = 0; i < a.size() + b.size() - 1; i++){
             ret[i] = aa[i]();
         }
         return ret;

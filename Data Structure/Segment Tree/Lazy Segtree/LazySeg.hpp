@@ -88,4 +88,4 @@ struct LazySeg {
         cout << "]\n";
         return out;
     }
-;
+};
