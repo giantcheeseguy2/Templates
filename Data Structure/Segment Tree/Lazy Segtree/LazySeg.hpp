@@ -71,6 +71,16 @@ struct LazySeg {
         build(v, 0, n - 1, 0);
     } 
 
+    LazySeg(int _n, T v){
+        n = _n;
+        vector<T> tmp(n, v);
+        int sz = 1;
+        while(sz < n) sz *= 2;
+        tag.assign(2*sz, empty);
+        seg.resize(2*sz);
+        build(tmp, 0, n - 1, 0);
+    }
+
     T query(int l, int r){
         return query(l, r, 0, n - 1, 0);
     }

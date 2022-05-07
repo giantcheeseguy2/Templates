@@ -45,7 +45,8 @@ namespace NTT {
         }
         //If we are computing invDFT, we must divide every value by n
         if(sign == -1){
-            for(mint &i : v) i /= n;
+            mint div = (mint)1/n;
+            for(mint &i : v) i *= div;
             //since we didn't make the power negative for the NTT, we should reverse the answer
             reverse(v.begin() + 1, v.end());
         }
@@ -59,7 +60,7 @@ namespace NTT {
         int n = 1;
         while(n < a.size() + b.size()) n *= 2;
         //computes a value for mod that can be used as a primitive root
-        mint proot = 2;
+        mint proot = 3;
         while(__gcd(proot(), Mod::mod - 1) != 1) proot++;
         //constructs two copies of polynomials a and b, but using complex numbers instead
         vector<mint> aa(a.begin(), a.end()), bb(b.begin(), b.end());
