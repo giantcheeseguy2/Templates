@@ -124,18 +124,4 @@ struct Matrix {
         return !(a == b);
     }
 
-    friend ostream& operator<<(ostream &out, Matrix<T, n> &x){
-        out << "[";
-        for(int i = 0; i < x.n; i++){
-            if(i) cout << "\n";
-            out << "[";
-            for(int j = 0; j < x.n; j++){
-                if(j) out << ", ";
-                cout << x[i][j];
-            }
-            out << "]";
-        }
-        out << "]\n";
-        return out;
-    }
 };

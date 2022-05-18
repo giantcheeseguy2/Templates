@@ -349,17 +349,6 @@ struct Polynomial {
 
     friend bool operator!=(const Polynomial &a, const Polynomial &b){ return a.poly != b.poly; }
 
-    Polynomial inv(){
-        assert(poly[0] != 0);
-        Polynomial ret(vector<T> { (T)1/poly[0] });
-        int n = poly.size();
-        for(int i = 2; i < 2*n; i *= 2){
-            ret *= Polynomial(vector<T> {2}) - (ret*(*this%i))%i;
-            ret %= i;
-        }
-        return ret%n;
-    }
-
     Polynomial inv(int n){
         assert(poly[0] != 0);
         Polynomial ret(vector<T> { (T)1/poly[0] });
@@ -446,7 +435,7 @@ int main(){
     cin >> n >> k;
     Polynomial<mint> p;
     for(int i = 0; i <= n; i++) cin >> p[i];
-    p = ((Polynomial(vector<mint> {1}) + (Polynomial(vector<mint> {2}) + p - Polynomial(vector<mint> {p[0]}) - p.sqrt().inv(n + 1).integral().exp(n + 1)).ln(n + 1)).pow(k, n + 1)).derivative();
+    p = ((Polynomial<mint>(vector<mint> {1}) + (Polynomial<mint>(vector<mint> {2}) + p - Polynomial<mint>(vector<mint> {p[0]}) - p.sqrt().inv(n + 1).integral().exp(n + 1)).ln(n + 1)).pow(k, n + 1)).derivative();
     for(int i = 0; i < p.size(); i++) cout << p[i] << " ";
     cout << endl;
 }
