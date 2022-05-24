@@ -1,5 +1,7 @@
-#pragma GCC optimize("O2,unroll-loops")
-#pragma GCC target("avx2,bmi2,popcnt,lzcnt")
+#pragma GCC optimize("O3")
+#pragma GCC optimization ("unroll-loops")
+#pragma GCC target("avx,avx2,fma")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,tune=native")
 #include <bits/stdc++.h>
 #include <ext/pb_ds/assoc_container.hpp>
 #include <ext/pb_ds/tree_policy.hpp>
