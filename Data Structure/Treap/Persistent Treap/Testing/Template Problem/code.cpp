@@ -2,7 +2,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct Treap {
+struct PersistentTreap {
 
     using T = long long;
     using L = long long;
@@ -23,12 +23,12 @@ struct Treap {
 
     struct node {
         array<int, 2> child;
-        int ind, sz, weight, rev;
+        int sz, weight;
+        bool rev;
         T val, sum;
         L tag;
 
-        node(int i, T v){
-            ind = i;
+        node(T v){
             val = sum = v;
             sz = 1;
             child = {-1, -1};
@@ -44,7 +44,7 @@ struct Treap {
     int n;
     vector<node> treap;
 
-    Treap(){
+    PersistentTreap(){
         n = 0;
     }
 
@@ -64,6 +64,8 @@ struct Treap {
     void push(int ind){
         if(ind == -1) return;
         if(treap[ind].rev == 0 && treap[ind].tag == empty()) return;
+        treap[ind].child[0] = copy(treap[ind].child[0]);
+        treap[ind].child[1] = copy(treap[ind].child[1]);
         if(treap[ind].rev) swap(treap[ind].child[0], treap[ind].child[1]);
         for(int i = 0; i <= 1; i++){
             int nxt = treap[ind].child[i];
@@ -84,12 +86,13 @@ struct Treap {
     }
 
     int newnode(T v){
-        treap.push_back(node(n, v));
+        treap.push_back(node(v));
         return n++;
     }
 
     int copy(int ind){
-        treap.pb(treap[ind]);
+        if(ind == -1) return -1;
+        treap.push_back(treap[ind]);
         return n++;
     }
 
@@ -100,10 +103,7 @@ struct Treap {
         int cur = copy(rt);
         int nxt = (treap[cur].child[0] == -1 ? 0 : treap[treap[cur].child[0]].sz);
         pair<int, int> ret;
-        if(nxt == k){
-            ret = {treap[cur].child[0], rt};
-            treap[cur].child[0] = -1;
-        } else if(nxt < k){
+        if(nxt < k){
             ret = split(treap[cur].r(), k - nxt - 1);
             treap[cur].child[1] = ret.first;
             ret.first = cur;
@@ -117,20 +117,20 @@ struct Treap {
     }
 
     int merge(int a, int b){
-        if(a == -1) return b;
-        if(b == -1) return a;
+        if(a == -1) return copy(b);
+        if(b == -1) return copy(a);
         if(treap[a].weight < treap[b].weight){
             push(a);
             int cur = copy(a);
             treap[cur].child[1] = merge(treap[cur].child[1], b);
-            pull(a);
-            return a;
+            pull(cur);
+            return cur;
         } else {
             push(b);
             int cur = copy(b);
             treap[cur].child[0] = merge(a, treap[cur].child[0]);
             pull(cur);
-            return b;
+            return cur;
         }
     }
 
@@ -169,11 +169,41 @@ struct Treap {
         pair<int, int> a = split(rt, l);
         pair<int, int> b = split(a.second, r - l + 1); 
         T ret = treap[b.first].sum;
-        rt = merge(a.first, merge(b.first, b.second));
         return ret;
     }
 };
 
 int main(){
-
+    int q;
+    cin >> q;
+    PersistentTreap treap;
+    treap.reserve(20000000);
+    long long last = 0;
+    int rt[q + 1];
+    rt[0] = -1;
+    for(int i = 1; i <= q; i++){
+        long long t, a, b, c = -1;
+        cin >> t >> a >> b;
+        b ^= last;
+        rt[i] = treap.copy(rt[t]);
+        if(a == 1){
+            cin >> c;
+            c ^= last;
+            assert(rt[i] == -1 || b <= treap.treap[rt[i]].sz);
+            treap.insert(rt[i], b, c);
+        } else if(a == 2){
+            assert(rt[i] != -1 && b - 1 < treap.treap[rt[i]].sz);
+            treap.erase(rt[i], b - 1);
+        } else if(a == 3){
+            cin >> c;
+            c ^= last;
+            assert(0 <= b - 1 && c - 1 < treap.treap[rt[i]].sz);
+            treap.reverse(rt[i], b - 1, c - 1);
+        } else {
+            cin >> c;
+            c ^= last;
+            assert(0 <= b - 1 && c - 1 < treap.treap[rt[i]].sz);
+            cout << (last = treap.query(rt[i], b - 1, c - 1)) << "\n";
+        }
+    }
 }

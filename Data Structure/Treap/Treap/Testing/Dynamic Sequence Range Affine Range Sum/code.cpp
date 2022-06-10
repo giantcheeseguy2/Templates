@@ -181,12 +181,12 @@ struct Treap {
 
     struct node {
         array<int, 2> child;
-        int ind, sz, weight, rev;
+        int sz, weight;
+        bool rev;
         T val, sum;
         L tag;
 
-        node(int i, T v){
-            ind = i;
+        node(T v){
             val = sum = v;
             sz = 1;
             child = {-1, -1};
@@ -242,7 +242,7 @@ struct Treap {
     }
 
     int newnode(T v){
-        treap.push_back(node(n, v));
+        treap.push_back(node(v));
         return n++;
     }
 
@@ -252,10 +252,7 @@ struct Treap {
         push(rt);
         int nxt = (treap[rt].child[0] == -1 ? 0 : treap[treap[rt].child[0]].sz);
         pair<int, int> ret;
-        if(nxt == k){
-            ret = {treap[rt].child[0], rt};
-            treap[rt].child[0] = -1;
-        } else if(nxt < k){
+        if(nxt < k){
             ret = split(treap[rt].r(), k - nxt - 1);
             treap[rt].child[1] = ret.first;
             ret.first = rt;

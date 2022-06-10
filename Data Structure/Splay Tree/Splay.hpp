@@ -179,17 +179,6 @@ struct Splay {
         rt = merge(splay[rt].child[0], splay[rt].child[1]);
     }
 
-    //rotates l...r k, l_i = l_(i - k)
-    void rotate(int &rt, int l, int r, int k){
-        if(l == r) return;
-        k %= r - l + 1;
-        if(k == 0) return;
-        pair<int, int> a = split(rt, l - 1);
-        pair<int, int> b = split(a.second, r - l);
-        pair<int, int> cur = split(b.first, k - 1);
-        rt = merge(a.first, merge(cur.second, merge(cur.first, b.second)));
-    }
-
     void update(int &rt, int l, int r, L v){
         assert(0 <= l && r < splay[rt].sz);
         if(0 == l && r == splay[rt].sz - 1){

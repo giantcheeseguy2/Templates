@@ -19,18 +19,18 @@ struct Treap {
 
     struct node {
         array<int, 2> child;
-        int ind, sz, weight, rev;
+        int sz;
+        bool rev;
         T val, sum;
         L tag;
 
-        node(int i, T v){
+        node(T v){
             ind = i;
             val = sum = v;
             sz = 1;
             child = {-1, -1};
             tag = empty();
             rev = 0;
-            weight = rand();
         }
 
         int l(){ return child[0]; }
@@ -80,7 +80,7 @@ struct Treap {
     }
 
     int newnode(T v){
-        treap.push_back(node(n, v));
+        treap.push_back(node(v));
         return n++;
     }
 
@@ -90,10 +90,7 @@ struct Treap {
         push(rt);
         int nxt = (treap[rt].child[0] == -1 ? 0 : treap[treap[rt].child[0]].sz);
         pair<int, int> ret;
-        if(nxt == k){
-            ret = {treap[rt].child[0], rt};
-            treap[rt].child[0] = -1;
-        } else if(nxt < k){
+        if(nxt < k){
             ret = split(treap[rt].r(), k - nxt - 1);
             treap[rt].child[1] = ret.first;
             ret.first = rt;
@@ -109,7 +106,7 @@ struct Treap {
     int merge(int a, int b){
         if(a == -1) return b;
         if(b == -1) return a;
-        if(treap[a].weight < treap[b].weight){
+        if(rand()%(treap[a].sz + treap[b].sz) < treap[b].sz){}
             push(a);
             treap[a].child[1] = merge(treap[a].child[1], b);
             pull(a);
